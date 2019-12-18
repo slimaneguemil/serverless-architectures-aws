@@ -1,13 +1,8 @@
-/**
- * Created by Peter Sbarski
- * Serverless Architectures on AWS
- * http://book.acloud.guru/
- * Last Updated: Feb 11, 2017
- */
 
 'use strict';
 
 var jwt = require('jsonwebtoken');
+var request = require('request');
 
 var generatePolicy = function(principalId, effect, resource) {
     var authResponse = {};
@@ -27,9 +22,14 @@ var generatePolicy = function(principalId, effect, resource) {
 }
 
 exports.handler = function(event, context, callback){
+
+
+    console.log('BEGIN *****************');
+    console.log('event:', event.authorizationToken);
+
     if (!event.authorizationToken) {
-    	callback('Could not find authToken');
-    	return;
+        callback('Could not find authToken');
+        return;
     }
     var token = event.authorizationToken.split(' ')[1];
 
@@ -37,12 +37,12 @@ exports.handler = function(event, context, callback){
         url: 'https://'+ process.env.DOMAIN + '/userinfo',
         method: 'GET',
         headers: {
-            'authorization': event.authToken
+            'authorization': event.authorizationToken
         }
     };
 
     request(options, function(error, response, body){
-        console.log(' POST *****************', options);
+        console.log('inside request *****************', options);
         if (!error && response.statusCode === 200) {
             console.log(' SUCCESS *****************', error);
             callback(null, generatePolicy('user', 'allow', event.methodArn));
