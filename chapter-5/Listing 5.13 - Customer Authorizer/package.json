@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "run-local-lambda --file index.js --event tests/event.json",
-    "deploy": "aws lambda update-function-code --function-name custom-authorizer --zip-file fileb://Lambda-Deployment.zip",
-    "predeploy": "zip -r Lambda-Deployment.zip * -x *.zip *.json *.log"
+    "deploy": "aws lambda update-function-code --function-name custom-authorizer --zip-file fileb://Lambda-Deployment.zip --profile video",
+    "predeploy": "zip -r Lambda-Deployment.zip * -x *.zip  *.log"
   },
   "dependencies": {
     "jsonwebtoken": "^5.7.0"

@@ -31,26 +31,16 @@ exports.handler = function(event, context, callback){
     	callback('Could not find authToken');
     	return;
     }
+
     var token = event.authorizationToken.split(' ')[1];
 
-    var options = {
-        url: 'https://'+ process.env.DOMAIN + '/userinfo',
-        method: 'GET',
-        headers: {
-            'authorization': event.authToken
-        }
-    };
-
-    request(options, function(error, response, body){
-        console.log(' POST *****************', options);
-        if (!error && response.statusCode === 200) {
-            console.log(' SUCCESS *****************', error);
-            callback(null, generatePolicy('user', 'allow', event.methodArn));
-
-        } else {
-            console.log(' ERROR *****************', response.statusCode);
-            callback('Authorization Failed');
-        }
-    });
-
+    var secretBuffer = new Buffer(process.env.AUTH0_SECRET);
+    jwt.verify(token, secretBuffer, function(err, decoded){
+    	if(err){
+    		console.log('Failed jwt verification: ', err, 'auth: ', event.authorizationToken);
+    		callback('Authorization Failed');
+    	} else {
+    		callback(null, generatePolicy('user', 'allow', event.methodArn));
+    	}
+    })
 };

@@ -22,9 +22,9 @@ exports.handler = function(event, context, callback){
 
     //remove the extension
     var outputKey = sourceKey.split('.')[0];
-
+    console.log('key:', key, sourceKey, outputKey);
     var params = {
-        PipelineId: '1451470066051-jscnci',
+        PipelineId: '1575989817128-whh2ak',
         Input: {
             Key: sourceKey
         },

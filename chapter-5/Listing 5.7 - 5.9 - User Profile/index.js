@@ -6,43 +6,46 @@
  */
 
 'use strict';
-
+var AWS = require('aws-sdk');
 var jwt = require('jsonwebtoken');
 var request = require('request');
 
 exports.handler = function(event, context, callback){
+
+    console.log('*****************');
+    console.log('event:',JSON.stringify(event));
     if (!event.authToken) {
-    	callback('Could not find authToken');
+    	callback('Could not find authToken event :' + JSON.stringify(event));
     	return;
     }
 
     var token = event.authToken.split(' ')[1];
 
     var secretBuffer = new Buffer(process.env.AUTH0_SECRET);
-    jwt.verify(token, secretBuffer, function(err, decoded){
-    	if(err){
-    		console.log('Failed jwt verification: ', err, 'auth: ', event.authToken);
-    		callback('Authorization Failed');
-    	} else {
 
-        var body = {
-          'id_token': token
-        };
-
-        var options = {
-          url: 'https://'+ process.env.DOMAIN + '/tokeninfo',
-          method: 'POST',
-          json: true,
-          body: body
-        };
+        // var options2 = {
+        //   url: 'https://'+ process.env.DOMAIN + '/userinfo',
+        //   method: 'POST',
+        //   json: true,
+        //   body: body
+        // };
+    var options = {
+        url: 'https://'+ process.env.DOMAIN + '/userinfo',
+        method: 'GET',
+        headers: {
+            'authorization': event.authToken
+        }
+    };
 
         request(options, function(error, response, body){
+            console.log(' POST *****************', options);
           if (!error && response.statusCode === 200) {
+              console.log(' SUCCESS *****************', error);
             callback(null, body);
           } else {
+              console.log(' ERROR *****************', response.statusCode);
             callback(error);
           }
         });
-    	}
-    })
+
 };
